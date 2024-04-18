@@ -37,19 +37,27 @@ async function handler(ctx) {
         },
     });
 
-    const { title: name, pages: data } = response.data.data;
+    const { pic, title: name, pages: data } = response.data.data;
 
     return {
         title: `视频 ${name} 的选集列表`,
         link,
         description: `视频 ${name} 的视频选集列表`,
+        icon: pic,
+        logo: pic,
         item: data
             .sort((a, b) => b.page - a.page)
             .slice(0, ctx.req.query('limit') ? Number.parseInt(ctx.req.query('limit')) : 10)
             .map((item) => ({
                 title: item.part,
+                cover: item.first_frame,
                 description: `${item.part} - ${name}${disableEmbed ? '' : `<br><br>${utils.iframe(aid, item.page, bvid)}`}`,
                 link: `${link}?p=${item.page}`,
+                _extra: {
+                    intro: item.part,
+                    duration: item.duration,
+                    iframeUrl: utils.iframe(aid, item.page, bvid),
+                },
             })),
     };
 }

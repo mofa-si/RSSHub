@@ -78,10 +78,15 @@ async function handler(ctx) {
             descList.push(`<img src="${item.pic}">`);
             return {
                 title: item.title,
+                cover: item.pic,
                 description: descList.join('<br>'),
                 pubDate: parseDate(item.pubdate, 'X'),
                 link: item.pubdate > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.aid}`,
                 author: userName,
+                _extra: {
+                    duration: item.length,
+                    iframeUrl: utils.iframe(item.aid),
+                },
             };
         }),
     };

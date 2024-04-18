@@ -37,7 +37,7 @@ async function handler(ctx) {
     const cookie = await cache.getCookie();
     const wbiVerifyString = await cache.getWbiVerifyString();
     const dmImgList = utils.getDmImgList();
-    const [name, face] = await cache.getUsernameAndFaceFromUID(uid);
+    const [name, face, sign] = await cache.getUsernameAndFaceFromUID(uid);
 
     // await got(`https://space.bilibili.com/${uid}/video?tid=0&page=1&keyword=&order=pubdate`, {
     //     headers: {
@@ -61,7 +61,7 @@ async function handler(ctx) {
     return {
         title: `${name} 的 bilibili 空间`,
         link: `https://space.bilibili.com/${uid}`,
-        description: `${name} 的 bilibili 空间`,
+        description: sign,
         logo: face,
         icon: face,
         item:
@@ -70,11 +70,17 @@ async function handler(ctx) {
             data.data.list.vlist &&
             data.data.list.vlist.map((item) => ({
                 title: item.title,
+                cover: item.pic,
                 description: `${item.description}${disableEmbed ? '' : `<br><br>${utils.iframe(item.aid)}`}<br><img src="${item.pic}">`,
                 pubDate: new Date(item.created * 1000).toUTCString(),
                 link: item.created > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.aid}`,
                 author: name,
                 comments: item.comment,
+                _extra: {
+                    intro: item.description,
+                    duration: item.length,
+                    iframeUrl: utils.iframe(item.aid),
+                },
             })),
     };
 }

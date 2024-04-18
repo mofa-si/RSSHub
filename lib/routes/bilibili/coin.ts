@@ -51,10 +51,16 @@ async function handler(ctx) {
         description: `${name} 的 bilibili 投币视频`,
         item: data.map((item) => ({
             title: item.title,
+            cover: item.pic,
             description: `${item.desc}${disableEmbed ? '' : `<br><br>${utils.iframe(item.aid)}`}<br><img src='${item.pic}'>`,
             pubDate: parseDate(item.time * 1000),
             link: item.time > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.aid}`,
             author: item.owner.name,
+            _extra: {
+                intro: item.desc,
+                duration: item.length,
+                iframeUrl: utils.iframe(item.aid),
+            },
         })),
     };
 }

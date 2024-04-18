@@ -57,7 +57,7 @@ async function handler(ctx) {
     }
 
     return {
-        title: `${userName} 的 bilibili 合集 ${data.meta.name}`,
+        title: `${userName} - ${data.meta.name}`,
         link,
         description: `${userName} 的 bilibili 合集`,
         logo: face,
@@ -70,10 +70,15 @@ async function handler(ctx) {
             descList.push(`<img src="${item.pic}">`);
             return {
                 title: item.title,
+                cover: item.pic,
                 description: descList.join('<br>'),
                 pubDate: parseDate(item.pubdate, 'X'),
                 link: item.pubdate > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.aid}`,
                 author: userName,
+                _extra: {
+                    duration: item.length,
+                    iframeUrl: utils.iframe(item.aid),
+                },
             };
         }),
     };

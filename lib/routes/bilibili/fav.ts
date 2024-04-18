@@ -51,10 +51,16 @@ async function handler(ctx) {
             data.medias &&
             data.medias.map((item) => ({
                 title: item.title,
+                cover: item.pic,
                 description: `${item.intro}${disableEmbed ? '' : `<br><br>${utils.iframe(item.id)}`}<br><img src='${item.cover}'>`,
                 pubDate: parseDate(item.fav_time * 1000),
                 link: item.fav_time > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.id}`,
                 author: item.upper.name,
+                _extra: {
+                    intro: item.intro,
+                    duration: item.length,
+                    iframeUrl: utils.iframe(item.aid),
+                },
             })),
     };
 }

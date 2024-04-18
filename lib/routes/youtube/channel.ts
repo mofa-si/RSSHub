@@ -1,5 +1,7 @@
 import { Route } from '@/types';
 import cache from '@/utils/cache';
+import got from '@/utils/got';
+import * as cheerio from 'cheerio';
 import utils from './utils';
 import { config } from '@/config';
 import { parseDate } from '@/utils/parse-date';
@@ -49,26 +51,40 @@ async function handler(ctx) {
         throw new InvalidParameterError(`Invalid YouTube channel ID. \nYou may want to use <code>/youtube/user/:id</code> instead.`);
     }
 
+    const channelLink = `https://www.youtube.com/channel/${id}`;
+    const response = await got(channelLink);
+    const $ = cheerio.load(response.data);
+    const channelLogo = $('meta[property="og:image"]').attr('content');
+    const channelDescription = $('meta[property="og:description"]').attr('content');
+
     const playlistId = (await utils.getChannelWithId(id, 'contentDetails', cache)).data.items[0].contentDetails.relatedPlaylists.uploads;
 
     const data = (await utils.getPlaylistItems(playlistId, 'snippet', cache)).data.items;
 
     return {
         title: `${data[0].snippet.channelTitle} - YouTube`,
-        link: `https://www.youtube.com/channel/${id}`,
-        description: `YouTube channel ${data[0].snippet.channelTitle}`,
+        link: channelLink,
+        logo: channelLogo,
+        description: channelDescription,
         item: data
             .filter((d) => d.snippet.title !== 'Private video' && d.snippet.title !== 'Deleted video')
             .map((item) => {
                 const snippet = item.snippet;
                 const videoId = snippet.resourceId.videoId;
                 const img = utils.getThumbnail(snippet.thumbnails);
+                const description = utils.formatDescription(snippet.description);
                 return {
                     title: snippet.title,
-                    description: utils.renderDescription(embed, videoId, img, utils.formatDescription(snippet.description)),
+                    cover: img.url,
+                    description: utils.renderDescription(embed, videoId, img, description),
                     pubDate: parseDate(snippet.publishedAt),
                     link: `https://www.youtube.com/watch?v=${videoId}`,
                     author: snippet.videoOwnerChannelTitle,
+                    _extra: {
+                        intro: description,
+                        duration: snippet.duration,
+                        iframeUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+                    },
                 };
             }),
     };

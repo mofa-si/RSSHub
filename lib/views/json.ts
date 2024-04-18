@@ -11,8 +11,9 @@ const json = (data: Data) => {
         title: data.title || 'RSSHub',
         home_page_url: data.link || 'https://docs.rsshub.app',
         feed_url: data.feedLink,
-        description: `${data.description || data.title} - Made with love by RSSHub(https://github.com/DIYgod/RSSHub)`,
-        icon: data.image,
+        description: String(data.description || data.title),
+        // @ts-ignore
+        icon: data.image || data.logo || data.icon,
         authors: typeof data.author === 'string' ? [{ name: data.author }] : data.author,
         language: data.language || 'zh-cn',
         items: data.item?.map((item) => ({
@@ -21,7 +22,8 @@ const json = (data: Data) => {
             title: item.title,
             content_html: (item.content && item.content.html) || item.description || item.title,
             content_text: item.content && item.content.text,
-            image: item.image,
+            // @ts-ignore
+            image: item.image || item.cover,
             banner_image: item.banner,
             date_published: item.pubDate,
             date_modified: item.updated,

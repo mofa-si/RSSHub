@@ -38,15 +38,17 @@ async function handler(ctx) {
     const username = ctx.req.param('username');
     const embed = !ctx.req.param('embed');
 
+    const link = `https://www.youtube.com/${username}`;
+    const response = await got(link);
+    const $ = load(response.data);
+    const channelId = $('meta[itemprop="identifier"]').attr('content');
+    const channelName = $('meta[itemprop="name"]').attr('content');
+    const channelLogo = $('meta[property="og:image"]').attr('content');
+    const channelDescription = $('meta[property="og:description"]').attr('content');
+
     let playlistId;
-    let channelName;
     if (username.startsWith('@')) {
-        const link = `https://www.youtube.com/${username}`;
-        const response = await got(link);
-        const $ = load(response.data);
-        const channelId = $('meta[itemprop="identifier"]').attr('content');
-        channelName = $('meta[itemprop="name"]').attr('content');
-        playlistId = (await utils.getChannelWithId(channelId, 'contentDetails', cache)).data.items[0].contentDetails.relatedPlaylists.uploads;
+        playlistId = (await utils.getChannelWithId(channelId, 'contentDetails', ctx.cache)).data.items[0].contentDetails.relatedPlaylists.uploads;
     }
     playlistId = playlistId || (await utils.getChannelWithUsername(username, 'contentDetails', cache)).data.items[0].contentDetails.relatedPlaylists.uploads;
 
@@ -54,20 +56,28 @@ async function handler(ctx) {
 
     return {
         title: `${channelName || username} - YouTube`,
+        logo: channelLogo,
         link: username.startsWith('@') ? `https://www.youtube.com/${username}` : `https://www.youtube.com/user/${username}`,
-        description: `YouTube user ${username}`,
+        description: channelDescription,
         item: data
             .filter((d) => d.snippet.title !== 'Private video' && d.snippet.title !== 'Deleted video')
             .map((item) => {
                 const snippet = item.snippet;
                 const videoId = snippet.resourceId.videoId;
                 const img = utils.getThumbnail(snippet.thumbnails);
+                const description = utils.formatDescription(snippet.description);
                 return {
                     title: snippet.title,
-                    description: utils.renderDescription(embed, videoId, img, utils.formatDescription(snippet.description)),
+                    cover: img.url,
+                    description: utils.renderDescription(embed, videoId, img, description),
                     pubDate: parseDate(snippet.publishedAt),
                     link: `https://www.youtube.com/watch?v=${videoId}`,
                     author: snippet.videoOwnerChannelTitle,
+                    _extra: {
+                        intro: description,
+                        duration: snippet.duration,
+                        iframeUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+                    },
                 };
             }),
     };

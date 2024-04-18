@@ -101,9 +101,12 @@ const getUsernameFromUID = (uid) => {
 const getUsernameAndFaceFromUID = async (uid) => {
     const nameKey = 'bili-username-from-uid-' + uid;
     const faceKey = 'bili-userface-from-uid-' + uid;
+    const signKey = 'bili-usersign-from-uid-' + uid;
     let name = await cache.get(nameKey);
     let face = await cache.get(faceKey);
-    if (!name || !face) {
+    let sign = await cache.get(signKey);
+
+    if (!name || !face || !sign) {
         const cookie = await getCookie();
         const wbiVerifyString = await getWbiVerifyString();
         // await got(`https://space.bilibili.com/${uid}/`, {
@@ -122,13 +125,15 @@ const getUsernameAndFaceFromUID = async (uid) => {
         if (nameResponse.data.name) {
             name = nameResponse.data.name;
             face = nameResponse.data.face;
+            sign = nameResponse.data.sign;
         } else {
             logger.error(`Error when visiting /x/space/wbi/acc/info: ${JSON.stringify(nameResponse)}`);
         }
         cache.set(nameKey, name);
         cache.set(faceKey, face);
+        cache.set(signKey, sign);
     }
-    return [name, face];
+    return [name, face, sign];
 };
 
 const getLiveIDFromShortID = (shortID) => {
