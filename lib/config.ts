@@ -261,6 +261,7 @@ export type Config = {
         oauthTokenSecrets?: string[];
         username?: string;
         password?: string;
+        authenticationSecret?: string;
         cookie?: string;
     };
     weibo: {
@@ -285,6 +286,10 @@ export type Config = {
     xueqiu: {
         cookies?: string;
     };
+    yamibo: {
+        salt?: string;
+        auth?: string;
+    };
     youtube: {
         key?: string;
         clientId?: string;
@@ -296,6 +301,9 @@ export type Config = {
     };
     zodgame: {
         cookie?: string;
+    };
+    zsxq: {
+        accessToken?: string;
     };
 };
 
@@ -613,6 +621,7 @@ const calculateValue = () => {
             oauthTokenSecrets: envs.TWITTER_OAUTH_TOKEN_SECRET?.split(','),
             username: envs.TWITTER_USERNAME,
             password: envs.TWITTER_PASSWORD,
+            authenticationSecret: envs.TWITTER_AUTHENTICATION_SECRET,
             cookie: envs.TWITTER_COOKIE,
         },
         weibo: {
@@ -637,6 +646,10 @@ const calculateValue = () => {
         xueqiu: {
             cookies: envs.XUEQIU_COOKIES,
         },
+        yamibo: {
+            salt: envs.YAMIBO_SALT,
+            auth: envs.YAMIBO_AUTH,
+        },
         youtube: {
             key: envs.YOUTUBE_KEY,
             clientId: envs.YOUTUBE_CLIENT_ID,
@@ -648,6 +661,9 @@ const calculateValue = () => {
         },
         zodgame: {
             cookie: envs.ZODGAME_COOKIE,
+        },
+        zsxq: {
+            accessToken: envs.ZSXQ_ACCESS_TOKEN,
         },
     };
 
