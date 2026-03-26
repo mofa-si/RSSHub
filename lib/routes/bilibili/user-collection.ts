@@ -70,6 +70,10 @@ async function handler(ctx) {
             pubDate: parseDate(item.pubdate, 'X'),
             link: item.pubdate > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.aid}`,
             author: userName,
+            _extra: {
+                duration: item.duration,
+                iframeUrl: `https://player.bilibili.com/player.html?bvid=${item.bvid}&aid=${item.aid}`,
+            },
         })),
     };
 }

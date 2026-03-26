@@ -135,6 +135,11 @@ export const getDataByUsername = async ({ username, embed, filterShorts, isJsonF
                     link: `https://www.youtube.com/watch?v=${videoId}`,
                     author: snippet.videoOwnerChannelTitle,
                     image: img.url,
+                    _extra: {
+                        intro: utils.formatDescription(snippet.description),
+                        duration: detail?.contentDetails.duration ? dayjs.duration(detail.contentDetails.duration).asSeconds() : undefined,
+                        iframeUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+                    },
                     attachments: [
                         {
                             url: getVideoUrl(videoId),
@@ -180,6 +185,11 @@ export const getDataByChannelId = async ({ channelId, embed, filterShorts, isJso
                     link: `https://www.youtube.com/watch?v=${videoId}`,
                     author: snippet.videoOwnerChannelTitle,
                     image: img.url,
+                    _extra: {
+                        intro: utils.formatDescription(snippet.description),
+                        duration: detail?.contentDetails.duration ? dayjs.duration(detail.contentDetails.duration).asSeconds() : undefined,
+                        iframeUrl: `https://www.youtube-nocookie.com/embed/${videoId}`,
+                    },
                     attachments: [
                         {
                             url: getVideoUrl(videoId),

@@ -45,6 +45,8 @@ async function handler(ctx) {
         title: `视频 ${name} 的选集列表`,
         link,
         description: `视频 ${name} 的视频选集列表`,
+        icon: respdata.pic,
+        logo: respdata.pic,
         item: data
             .toSorted((a, b) => b.page - a.page)
             .slice(0, ctx.req.query('limit') ? Number.parseInt(ctx.req.query('limit')) : 10)
@@ -52,6 +54,12 @@ async function handler(ctx) {
                 title: item.part,
                 description: utils.renderUGCDescription(embed, respdata.pic, `${item.part} - ${name}`, respdata.aid, item.cid, respdata.bvid),
                 link: `${link}?p=${item.page}`,
+                cover: item.first_frame,
+                _extra: {
+                    intro: item.part,
+                    duration: item.duration,
+                    iframeUrl: `https://player.bilibili.com/player.html?bvid=${respdata.bvid}&aid=${respdata.aid}&page=${item.page}`,
+                },
             })),
     };
 }

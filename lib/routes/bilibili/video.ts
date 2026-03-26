@@ -66,11 +66,12 @@ async function handler(ctx: Context) {
     const usernameAndFace = await cache.getUsernameAndFaceFromUID(uid);
     const name = usernameAndFace[0] || data.data.list.vlist[0]?.author;
     const face = usernameAndFace[1];
+    const sign = usernameAndFace[2];
 
     return {
         title: `${name} 的 bilibili 空间`,
         link: `https://space.bilibili.com/${uid}`,
-        description: `${name} 的 bilibili 空间`,
+        description: sign || `${name} 的 bilibili 空间`,
         image: face ?? undefined,
         logo: face ?? undefined,
         icon: face ?? undefined,
@@ -88,6 +89,11 @@ async function handler(ctx: Context) {
                         link: item.created > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.aid}`,
                         author: name,
                         comments: item.comment,
+                        _extra: {
+                            intro: item.description,
+                            duration: item.length,
+                            iframeUrl: `https://player.bilibili.com/player.html?bvid=${item.bvid}&aid=${item.aid}`,
+                        },
                         attachments: item.bvid
                             ? [
                                   {

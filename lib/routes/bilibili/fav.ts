@@ -56,6 +56,11 @@ async function handler(ctx) {
                 pubDate: parseDate(item.fav_time * 1000),
                 link: item.fav_time > utils.bvidTime && item.bvid ? `https://www.bilibili.com/video/${item.bvid}` : `https://www.bilibili.com/video/av${item.id}`,
                 author: item.upper.name,
+                _extra: {
+                    intro: item.intro,
+                    duration: item.duration,
+                    iframeUrl: `https://player.bilibili.com/player.html?bvid=${item.bvid}&aid=${item.id}`,
+                },
             })),
     };
 }

@@ -143,8 +143,10 @@ const getUsernameFromUID = (uid) => {
 const getUsernameAndFaceFromUID = async (uid) => {
     const nameKey = 'bili-username-from-uid-' + uid;
     const faceKey = 'bili-userface-from-uid-' + uid;
+    const signKey = 'bili-usersign-from-uid-' + uid;
     let name = await cache.get(nameKey);
     let face = await cache.get(faceKey);
+    let sign = await cache.get(signKey);
     if (!name || !face) {
         const cookie = await getCookie();
         const wbiVerifyString = await getWbiVerifyString();
@@ -160,13 +162,15 @@ const getUsernameAndFaceFromUID = async (uid) => {
         if (nameResponse.data.name) {
             name = nameResponse.data.name;
             face = nameResponse.data.face;
+            sign = nameResponse.data.sign;
             cache.set(nameKey, nameResponse.data.name);
             cache.set(faceKey, nameResponse.data.face);
+            cache.set(signKey, nameResponse.data.sign);
         } else {
             logger.error(`Error when visiting /x/space/wbi/acc/info: ${JSON.stringify(nameResponse)}`);
         }
     }
-    return [name, face];
+    return [name, face, sign];
 };
 
 const getLiveIDFromShortID = (shortID) => {
